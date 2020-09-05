@@ -11,7 +11,7 @@ public class Frequency implements IMeasure<Double> {
 
     @Override
     public Double computeConcreteValue(EquivalenceClass equivalenceClass) {
-        return (double) equivalenceClass.getSequence().getIdList().size()/datasetSize*100;
+        return (double) equivalenceClass.getSequence().getIdList().size()/datasetSize;
     }
 
     @Override
