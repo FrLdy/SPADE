@@ -28,7 +28,9 @@ public abstract class Deserializer<P extends IPattern> {
      */
     protected Deserializer(String path) {
         this.path = path;
-        this.open();
+        if (!path.equals("")){
+            this.open();
+        }
     }
 
     /**

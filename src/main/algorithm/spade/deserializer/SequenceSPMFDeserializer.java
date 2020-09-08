@@ -5,7 +5,7 @@ import main.dataset.IDataset;
 import main.dataset.deserializer.SequenceDeserializer;
 import main.pattern.Item;
 import main.pattern.Itemset;
-import main.algorithm.spade.Sequence;
+import main.algorithm.spade.structure.Sequence;
 
 import java.io.IOException;
 
@@ -21,6 +21,11 @@ public class SequenceSPMFDeserializer<T extends Comparable<? super T>> extends S
         this.sequencesSeparator = "-2";
         this.itemsSeparator = " ";
     }
+
+    public SequenceSPMFDeserializer() {
+        this("");
+    }
+
 
 
     @Override
