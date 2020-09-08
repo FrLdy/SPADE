@@ -1,5 +1,7 @@
 package main.algorithm.spade.structure;
 
+import main.pattern.Item;
+
 import java.util.*;
 
 /**
@@ -93,7 +95,7 @@ public class IdList extends HashMap<Integer, List<Integer>>{
      * @param otherIdList the other IdList to join with this IdList.
      * @return The IdList result of temporal join.
      */
-    public IdList temporalJoin(IdList otherIdList){
+    public IdList temporalJoin(int minGap, IdList otherIdList, int maxGap){
         IdList res = new IdList();
         for (Integer oSid : otherIdList.keySet()){
             if (this.containsKey(oSid)){
@@ -102,7 +104,8 @@ public class IdList extends HashMap<Integer, List<Integer>>{
                         continue;
                     }
                     for (Integer eid : this.get(oSid)){
-                        if (oEid > eid){
+                        int diff = oEid-eid;
+                        if (oEid > eid && diff <= maxGap && diff >= minGap){
                             res.add(oSid, oEid);
                             break;
                         }
@@ -111,5 +114,17 @@ public class IdList extends HashMap<Integer, List<Integer>>{
             }
         }
         return res;
+    }
+
+    public IdList temporalJoin(IdList otherIdList){
+        return this.temporalJoin(Integer.MIN_VALUE, otherIdList,  Integer.MAX_VALUE);
+    }
+
+    public IdList temporalJoin(IdList idList, int maxGap){
+        return this.temporalJoin(Integer.MIN_VALUE, idList, maxGap);
+    }
+
+    public IdList temporalJoin(int minGap, IdList idList){
+        return this.temporalJoin(minGap, idList,Integer.MAX_VALUE);
     }
 }
