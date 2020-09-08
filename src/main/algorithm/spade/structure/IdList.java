@@ -1,4 +1,4 @@
-package main.algorithm.spade;
+package main.algorithm.spade.structure;
 
 import java.util.*;
 
