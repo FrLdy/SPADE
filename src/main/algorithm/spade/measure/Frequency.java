@@ -1,6 +1,6 @@
-package main.algorithm.measure;
+package main.algorithm.spade.measure;
 
-import main.algorithm.spade.EquivalenceClass;
+import main.algorithm.spade.structure.EquivalenceClass;
 
 public class Frequency implements IMeasure<Double> {
 
@@ -16,6 +16,6 @@ public class Frequency implements IMeasure<Double> {
 
     @Override
     public Double computePotentialValue(EquivalenceClass equivalenceClass) {
-        return this.computeConcreteValue(equivalenceClass);
+        return computeConcreteValue(equivalenceClass);
     }
 }

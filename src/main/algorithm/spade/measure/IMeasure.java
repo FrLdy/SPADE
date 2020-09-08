@@ -1,6 +1,6 @@
-package main.algorithm.measure;
+package main.algorithm.spade.measure;
 
-import main.algorithm.spade.EquivalenceClass;
+import main.algorithm.spade.structure.EquivalenceClass;
 
 public interface IMeasure<N extends Number> {
     N computeConcreteValue(EquivalenceClass equivalenceClass);
