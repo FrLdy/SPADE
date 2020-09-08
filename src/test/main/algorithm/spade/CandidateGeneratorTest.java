@@ -1,7 +1,6 @@
 package main.algorithm.spade;
 
 import main.algorithm.spade.deserializer.SequenceSPMFDeserializer;
-import main.algorithm.spade.spade.CandidateGenerator;
 import main.algorithm.spade.structure.IdList;
 import main.algorithm.spade.structure.Sequence;
 import main.pattern.Item;
@@ -276,5 +275,23 @@ class CandidateGeneratorTest {
         if (res.size()!=0){
             fail("Error");
         }
+    }
+
+    @Test
+    void temporalJoinWith2Seq(){
+        Sequence<String> s1;
+        Sequence<String> s2;
+        Sequence<String> s3;
+        Sequence<String> s4;
+
+        s1 = deserializer.stringToPattern("A -1 C -1 -2");
+        s2 = deserializer.stringToPattern("A C -1 -2");
+        s3 = deserializer.stringToPattern("C E -1 -2");
+        s4 = deserializer.stringToPattern("C -1 E -1 -2");
+        candidateGenerator.cMaxGap = true;
+        System.out.println(candidateGenerator.genCandidates(s1, s3));
+        System.out.println(candidateGenerator.genCandidates(s1, s4));
+        System.out.println(candidateGenerator.genCandidates(s2, s3));
+        System.out.println(candidateGenerator.genCandidates(s2, s4));
     }
 }
