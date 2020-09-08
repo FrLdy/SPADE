@@ -1,10 +1,25 @@
-package main.algorithm.spade.spade;
+package main.algorithm.spade;
+import main.algorithm.spade.structure.IdList;
 import main.algorithm.spade.structure.Sequence;
 import main.pattern.Itemset;
 
 import java.util.ArrayList;
 
 public class CandidateGenerator<T extends Comparable<? super T>> {
+    boolean cMinGap, cMaxGap;
+    int mingap, maxgap;
+
+    public CandidateGenerator(boolean cMinGap, boolean cMaxGap, int mingap, int maxgap) {
+        this.cMinGap = cMinGap;
+        this.cMaxGap = cMaxGap;
+        this.mingap = mingap;
+        this.maxgap = maxgap;
+    }
+
+    public CandidateGenerator(){
+        this(false, false, 0, 0);
+    }
+
 
     public ArrayList<Sequence<T>> genCandidates(Sequence<T> s1, Sequence<T> s2){
         ArrayList<Sequence<T>> res = new ArrayList<>();
@@ -18,14 +33,18 @@ public class CandidateGenerator<T extends Comparable<? super T>> {
 
         // P -> X v P -> Y = {P -> X -> Y, P -> Y -> X, P -> X Y}
         else if (s1SeqAtom && s2SeqAtom){
-            res.add(temporalJoin(s1, s2));
-            res.add(temporalJoin(s2, s1));
-            res.add(equalityJoin(s1, s2));
+            if (!cMaxGap){
+                res.add(temporalJoin(s1, s2));
+                res.add(temporalJoin(s2, s1));
+                res.add(equalityJoin(s1, s2));
+            } else {
+                res.add(temporalJoin(s1, s2));
+            }
         }
 
         // P -> X v PY = {PY -> X}
         else if (s1SeqAtom && !s2SeqAtom){
-            res.add(temporalJoin(s2, s1));
+            res.add((cMaxGap) ? equalityJoin(s1, s2) : temporalJoin(s2, s1));
         }
 
         // PX v P -> Y = {PX -> Y}
@@ -97,12 +116,27 @@ public class CandidateGenerator<T extends Comparable<? super T>> {
         return clone;
     }
 
-    public Sequence<T> temporalJoin(Sequence<T> s1, Sequence<T> s2){
+    public Sequence<T> temporalJoin(Sequence<T> s1, Sequence<T> s2) {
         Sequence<T> clone = s1.cloneSequence();
         Itemset<T> newItemset = new Itemset<>();
-        newItemset.add(s2.getLastItem().cloneItem());
-        clone.add(newItemset);
-        clone.setIdList(s1.getIdList().temporalJoin(s2.getIdList()));
+        IdList newIdList;
+        if (cMaxGap){
+            clone.add(s2.getLastItemset().cloneItemset());
+        } else {
+            newItemset.add(s2.getLastItem().cloneItem());
+            clone.add(newItemset);
+        }
+
+        if (cMaxGap && cMinGap){
+            newIdList = s1.getIdList().temporalJoin(mingap, s2.getIdList(), maxgap);
+        } else if (cMinGap){
+            newIdList = s1.getIdList().temporalJoin(mingap, s2.getIdList());
+        } else if (cMaxGap) {
+            newIdList = s1.getIdList().temporalJoin(s2.getIdList(), maxgap);
+        } else {
+            newIdList = s1.getIdList().temporalJoin(s2.getIdList());
+        }
+        clone.setIdList(newIdList);
         return clone;
     }
 }

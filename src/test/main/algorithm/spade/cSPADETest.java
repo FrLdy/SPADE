@@ -1,20 +1,19 @@
 package main.algorithm.spade;
 
 import main.algorithm.spade.deserializer.SequenceSPMFDeserializer;
-import main.algorithm.spade.spade.SPADE;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.Dataset;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SPADETest {
+class cSPADETest {
     private SequenceSPMFDeserializer<String> deserializer = new SequenceSPMFDeserializer<>();
     private Dataset<Sequence<String>> res;
 
-    public SPADETest() {
+    public cSPADETest() {
         Dataset<Sequence<String>> dataset = (Dataset<Sequence<String>>) new SequenceSPMFDeserializer<String>("data/spadeTest1.txt").deserialize();
-        SPADE<String> spade = new SPADE<>(0.5, dataset, false);
+        cSPADE<String> spade = new cSPADE<>(0.5, dataset, false);
         spade.run();
         res = spade.getResultDataset();
     }
@@ -30,6 +29,7 @@ class SPADETest {
                 "D -1 B F -1 A -1 -2"
         };
         if (res.size() < seqstr.length){
+            System.out.println(seqstr.length);
             System.out.println(res.size());
             fail("Error");
         }

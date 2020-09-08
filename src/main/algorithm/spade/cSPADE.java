@@ -1,4 +1,4 @@
-package main.algorithm.spade.spade;
+package main.algorithm.spade;
 
 import main.algorithm.spade.measure.Frequency;
 import main.algorithm.spade.measure.IMeasure;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SPADE<T extends Comparable<? super T>> {
+public class cSPADE<T extends Comparable<? super T>> {
     private Double minSup;
     private Dataset<Sequence<T>> entryDataset;
     private Dataset<Sequence<T>> resultDataset;
@@ -21,19 +21,29 @@ public class SPADE<T extends Comparable<? super T>> {
     private CandidateGenerator<T> candidateGenerator = new CandidateGenerator<>();
     private List<Sequence<T>> oneSequences = new ArrayList<>();
     private List<Sequence<T>> twoSequences = new ArrayList<>();
+    private HashMap<Item<T>, EquivalenceClass<T>> twoSeqsIndexedBysuffix = new HashMap<>();
     private boolean dfs;
+    boolean cMinGap, cMaxGap;
+    int mingap, maxgap;
 
-    public SPADE(Double minSup, Dataset<Sequence<T>> entryDataset, Dataset<Sequence<T>> resultDataset, boolean dfs) {
+    public cSPADE(Double minSup, Dataset<Sequence<T>> entryDataset, Dataset<Sequence<T>> resultDataset, boolean dfs,
+                  Integer mingap, Integer maxgap) {
         this.minSup = minSup;
         this.entryDataset = entryDataset;
         this.resultDataset = resultDataset;
         this.measure = new Frequency(entryDataset.size());
         this.dfs = dfs;
+        this.mingap = mingap;
+        this.maxgap = maxgap;
+        this.cMinGap = mingap > -1;
+        this.cMaxGap = maxgap > -1;
     }
 
-    public SPADE(Double minSup, Dataset<Sequence<T>> entryDataset, boolean dfs) {
-        this(minSup, entryDataset, new Dataset<>(), dfs);
+    public cSPADE(Double minSup, Dataset<Sequence<T>> entryDataset, boolean dfs) {
+        this(minSup, entryDataset, new Dataset<>(), dfs, -1, -1);
     }
+
+
 
     void computeOneSequences(){
         HashMap<Item<T>, Sequence<T>> res = new HashMap<>();
@@ -138,10 +148,15 @@ public class SPADE<T extends Comparable<? super T>> {
         for (int i = 0; i < size; i++){
 
             EquivalenceClass<T> eqC1 = equivalenceClass.get(i);
+            List<EquivalenceClass<T>> eqC2s;
+            if (cMaxGap){
+                Item<T> sufixItem = eqC1.sequence.getLastItem();
+                eqC2s = new ArrayList<>();
+            } else {
+                eqC2s = equivalenceClass.subList(i, equivalenceClass.size());
+            }
 
-            for (int j = i; j < size; j++){
-                EquivalenceClass<T> eqC2 = equivalenceClass.get(j);
-
+            for (EquivalenceClass<T> eqC2 : eqC2s){
                 candidates = candidateGenerator.genCandidates(eqC1.sequence, eqC2.sequence);
 
                 for (Sequence<T> cand : candidates){
@@ -162,6 +177,8 @@ public class SPADE<T extends Comparable<? super T>> {
             }
         }
     }
+
+//    public ArrayList<EquivalenceClass<T>>
 
     public void enumerateSeq(EquivalenceClass<T> equivalenceClass){
         this.enumerateSeq(equivalenceClass, false);
