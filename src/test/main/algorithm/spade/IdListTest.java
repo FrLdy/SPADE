@@ -80,5 +80,33 @@ class IdListTest {
 
     }
 
+    @Test
+    void temporalJoinMaxGap() {
+        int maxGap = 10;
+        IdList idList = idList1.temporalJoin(idList2, maxGap);
+        IdList verif = new IdList();
+        verif.add(20, 20);
+        verif.add(8, 40);
+        if (!idList.equals(verif)){
+            fail();
+        }
+    }
+
+    @Test
+    void temporalJoinMinGap() {
+        int minGap = 30;
+        IdList idList = idList1.temporalJoin(minGap, idList2);
+        System.out.println(idList);
+        IdList verif = new IdList();
+        verif.add(1, 80);
+        verif.add(1, 70);
+        verif.add(8, 40);
+        verif.add(8, 50);
+        verif.add(8, 80);
+        if (!idList.equals(verif)){
+            fail();
+        }
+    }
+
 
 }
