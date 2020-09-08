@@ -123,7 +123,7 @@ public class Sequence<T extends Comparable<? super T>> extends ArrayList<Itemset
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < this.size(); i++) {
             stringBuilder.append(this.get(i).toString());
-            stringBuilder.append((i != this.size()-1) ? " -> " : "");
+            stringBuilder.append((i != this.size()-1) ? " " : "");
         }
         return stringBuilder.toString();
     }

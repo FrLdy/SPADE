@@ -61,12 +61,13 @@ public class Itemset<T extends Comparable<? super T>> extends ArrayList<Item<T>>
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<");
         for (int i = 0 ; i  < this.size(); i++){
             Item<T> item = this.get(i);
-//            stringBuilder.append(System.identityHashCode(item));
             stringBuilder.append(item.toString());
-            stringBuilder.append((i != this.size()-1) ? " " : "");
+            stringBuilder.append((i != this.size()-1) ? ", " : "");
         }
+        stringBuilder.append(">");
         return stringBuilder.toString();
     }
 
