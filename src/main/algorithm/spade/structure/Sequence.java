@@ -1,14 +1,18 @@
-package main.algorithm.spade;
+package main.algorithm.spade.structure;
 
 import main.pattern.Item;
 import main.pattern.Itemset;
 
 public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequence<T> {
     private IdList idList;
-    private Integer support;
+    private Double support;
 
     public Sequence() {
         this.setIdList(new IdList());
+    }
+
+    public Sequence(String seq){
+
     }
 
     public Sequence(Item<T> item){
@@ -22,7 +26,7 @@ public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequ
         return idList;
     }
 
-    public Integer getSupport() {
+    public Double getSupport() {
         return support;
     }
 
@@ -30,7 +34,7 @@ public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequ
         this.idList = idList;
     }
 
-    public void setSupport(Integer support) {
+    public void setSupport(Double support) {
         this.support = support;
     }
 
@@ -43,5 +47,10 @@ public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequ
         clone.idList = (IdList) idList.clone();
         clone.support = support;
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " : " + getSupport();
     }
 }
