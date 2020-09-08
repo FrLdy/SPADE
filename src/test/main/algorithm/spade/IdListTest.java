@@ -1,8 +1,7 @@
 package main.algorithm.spade;
 
+import main.algorithm.spade.structure.IdList;
 import org.junit.jupiter.api.Test;
-
-import javax.xml.transform.Source;
 
 import static org.junit.jupiter.api.Assertions.*;
 

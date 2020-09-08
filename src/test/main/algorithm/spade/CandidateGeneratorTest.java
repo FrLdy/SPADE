@@ -1,14 +1,22 @@
 package main.algorithm.spade;
 
+import main.algorithm.spade.deserializer.SequenceSPMFDeserializer;
+import main.algorithm.spade.spade.CandidateGenerator;
+import main.algorithm.spade.structure.IdList;
+import main.algorithm.spade.structure.Sequence;
 import main.pattern.Item;
 import main.pattern.Itemset;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CandidateGeneratorTest {
     private CandidateGenerator<String> candidateGenerator;
     private Sequence<String> p_a, p_f;
+    private SequenceSPMFDeserializer<String> deserializer = new SequenceSPMFDeserializer<>();
 
     public CandidateGeneratorTest() {
         this.candidateGenerator = new CandidateGenerator<>();
@@ -218,6 +226,55 @@ class CandidateGeneratorTest {
         }
         if (!s.getIdList().equals(verif.getIdList())){
             fail("Error equality join");
+        }
+    }
+
+    @Test
+    void genCandidates() {
+        Sequence<String> s1, s2, v1, v2, v3;
+        ArrayList<Sequence<String>> res;
+
+        s1 = deserializer.stringToPattern("p -1 a -1 f -1 -2");
+        s2 = deserializer.stringToPattern("p -1 a -1 d -1 -2");
+
+        v1 = deserializer.stringToPattern("p -1 a -1 f d -1 -2");
+        v2 = deserializer.stringToPattern("p -1 a -1 f -1 d -1 -2");
+        v3 = deserializer.stringToPattern("p -1 a -1 d -1 f -1 -2");
+
+        res =  candidateGenerator.genCandidates(s1, s2);
+        if (!res.containsAll(Arrays.asList(v1, v2, v3)) || res.size()!=3){
+            fail("Error");
+        }
+
+        s1 = deserializer.stringToPattern("p -1 a f");
+        s2 = deserializer.stringToPattern("p -1 a -1 d -1 -2");
+        v1 = deserializer.stringToPattern("p -1 a f -1 d -1 -2");
+        res =  candidateGenerator.genCandidates(s1, s2);
+        if (!res.contains(v1) || res.size()!=1){
+            fail("Error");
+        }
+
+        s2 = deserializer.stringToPattern("p -1 a f");
+        s1 = deserializer.stringToPattern("p -1 a -1 d -1 -2");
+        v1 = deserializer.stringToPattern("p -1 a f -1 d -1 -2");
+        res =  candidateGenerator.genCandidates(s1, s2);
+        if (!res.contains(v1) || res.size()!=1){
+            fail("Error");
+        }
+
+        s1 = deserializer.stringToPattern("p -1 a f");
+        s2 = deserializer.stringToPattern("p -1 a d");
+        v1 = deserializer.stringToPattern("p -1 a d f -1 -2");
+        res =  candidateGenerator.genCandidates(s1, s2);
+        if (!res.contains(v1) || res.size()!=1){
+            fail("Error");
+        }
+
+        s1 = deserializer.stringToPattern("p -1 a d -1 -2");
+        v1 = deserializer.stringToPattern("p -1 a d -1 -2");
+        res =  candidateGenerator.genCandidates(s1, s1);
+        if (res.size()!=0){
+            fail("Error");
         }
     }
 }
