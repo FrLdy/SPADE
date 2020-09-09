@@ -1,6 +1,7 @@
 package main.algorithm.spade;
 import main.algorithm.spade.structure.IdList;
 import main.algorithm.spade.structure.Sequence;
+import main.pattern.Item;
 import main.pattern.Itemset;
 
 import java.util.ArrayList;
@@ -33,12 +34,10 @@ public class CandidateGenerator<T extends Comparable<? super T>> {
 
         // P -> X v P -> Y = {P -> X -> Y, P -> Y -> X, P -> X Y}
         else if (s1SeqAtom && s2SeqAtom){
+            res.add(temporalJoin(s1, s2));
             if (!cMaxGap){
-                res.add(temporalJoin(s1, s2));
                 res.add(temporalJoin(s2, s1));
                 res.add(equalityJoin(s1, s2));
-            } else {
-                res.add(temporalJoin(s1, s2));
             }
         }
 
@@ -138,5 +137,37 @@ public class CandidateGenerator<T extends Comparable<? super T>> {
         }
         clone.setIdList(newIdList);
         return clone;
+    }
+
+    public void setcMinGap(boolean cMinGap) {
+        this.cMinGap = cMinGap;
+    }
+
+    public void setcMaxGap(boolean cMaxGap) {
+        this.cMaxGap = cMaxGap;
+    }
+
+    public void setMingap(int mingap) {
+        this.mingap = mingap;
+    }
+
+    public void setMaxgap(int maxgap) {
+        this.maxgap = maxgap;
+    }
+
+    public boolean iscMinGap() {
+        return cMinGap;
+    }
+
+    public boolean iscMaxGap() {
+        return cMaxGap;
+    }
+
+    public int getMingap() {
+        return mingap;
+    }
+
+    public int getMaxgap() {
+        return maxgap;
     }
 }
