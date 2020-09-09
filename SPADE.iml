@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.junit.jupiter:junit-jupiter:5.4.2" level="application" />
+    <orderEntry type="library" name="org.unix4j:unix4j-command:0.5" level="application" />
   </component>
 </module>
