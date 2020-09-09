@@ -1,4 +1,4 @@
-package main.database.deserializer.sequence;
+package main.algorithm.spade.deserializer;
 
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.DatasetWithLabels;
