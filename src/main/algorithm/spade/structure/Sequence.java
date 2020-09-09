@@ -40,12 +40,18 @@ public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequ
 
     @Override
     public Sequence<T> cloneSequence() {
+        return this.cloneSequence(false);
+    }
+
+    public Sequence<T> cloneSequence(boolean keepSupport) {
         Sequence<T> clone = new Sequence<>();
         for (Itemset<T> iset : this){
             clone.add(iset.cloneItemset());
         }
         clone.idList = (IdList) idList.clone();
-        clone.support = support;
+        if (keepSupport){
+            clone.support = support;
+        }
         return clone;
     }
 
