@@ -20,9 +20,7 @@ class CandidateGeneratorTest {
     public CandidateGeneratorTest() {
         this.candidateGenerator = new CandidateGenerator<>();
 
-        this.p_a = new Sequence<>();
-        p_a.add(new Itemset<>(new String[]{"p"}));
-        p_a.add(new Itemset<>(new String[]{"a"}));
+        this.p_a = deserializer.stringToPattern("p -1 a -1 -2");
         p_a.setIdList(new IdList());
         p_a.getIdList().add(1, 20);
         p_a.getIdList().add(1, 30);
@@ -39,9 +37,7 @@ class CandidateGeneratorTest {
         p_a.getIdList().add(17, 20);
         p_a.getIdList().add(20, 10);
 
-        this.p_f = new Sequence<>();
-        p_f.add(new Itemset<>(new String[]{"p"}));
-        p_f.add(new Itemset<>(new String[]{"f"}));
+        this.p_f = deserializer.stringToPattern("p -1 f -1 -2");
         p_f.setIdList(new IdList());
         p_f.getIdList().add(1, 70);
         p_f.getIdList().add(1, 80);
@@ -61,26 +57,20 @@ class CandidateGeneratorTest {
 
     @Test
     void isEventAtom() {
-        Sequence<String> sequence = new Sequence<>();
-        sequence.add(new Itemset<>(new String[]{"a"}));
-        sequence.add(new Itemset<>(new String[]{"b"}));
+        Sequence<String> sequence = deserializer.stringToPattern("a -1 b -1 -2");
+
         // <a> <b> : false
         if (candidateGenerator.isEventAtom(sequence)){
             fail("Error event atom");
         }
 
-        sequence = new Sequence<>();
-        sequence.add(new Itemset<>(new String[]{"a"}));
-        sequence.add(new Itemset<>(new String[]{"b", "c"}));
+        sequence = deserializer.stringToPattern("a -1 b c -1 -2");
         // <a> <b, c> : true
         if (!candidateGenerator.isEventAtom(sequence)){
             fail("Error event atom");
         }
 
-        sequence = new Sequence<>();
-        sequence.add(new Itemset<>(new String[]{"a"}));
-        sequence.add(new Itemset<>(new String[]{"b", "c"}));
-        sequence.add(new Itemset<>(new String[]{"e"}));
+        sequence = deserializer.stringToPattern("a -1 b c -1 e -1 -2");
         // <a> <b, c> <e> : false
         if (candidateGenerator.isEventAtom(sequence)){
             fail("Error event atom");
@@ -278,20 +268,30 @@ class CandidateGeneratorTest {
     }
 
     @Test
-    void temporalJoinWith2Seq(){
-        Sequence<String> s1;
-        Sequence<String> s2;
-        Sequence<String> s3;
-        Sequence<String> s4;
+    void joinWith2Seq(){
+        candidateGenerator.cMaxGap = true;
+        Sequence<String> s1, s2, s3, s4, v1, v2, v3, v4;
 
         s1 = deserializer.stringToPattern("A -1 C -1 -2");
         s2 = deserializer.stringToPattern("A C -1 -2");
+
         s3 = deserializer.stringToPattern("C E -1 -2");
         s4 = deserializer.stringToPattern("C -1 E -1 -2");
-        candidateGenerator.cMaxGap = true;
-        System.out.println(candidateGenerator.genCandidates(s1, s3));
-        System.out.println(candidateGenerator.genCandidates(s1, s4));
-        System.out.println(candidateGenerator.genCandidates(s2, s3));
-        System.out.println(candidateGenerator.genCandidates(s2, s4));
+
+        v1 = deserializer.stringToPattern("A -1 C E -1 -2");
+        v2 = deserializer.stringToPattern("A -1 C -1 E -1 -2");
+        v3 = deserializer.stringToPattern("A C E -1 -2");
+        v4 = deserializer.stringToPattern("A C -1 E -1 -2");
+
+        joinWith2Seq(s1, s3, v1);
+        joinWith2Seq(s1, s4, v2);
+        joinWith2Seq(s2, s3, v3);
+        joinWith2Seq(s2, s4, v4);
+    }
+
+    void joinWith2Seq(Sequence<String> s1, Sequence<String> s2, Sequence<String> res){
+        if (!candidateGenerator.genCandidates(s1, s2).get(0).equals(res)){
+            fail();
+        }
     }
 }
