@@ -97,11 +97,13 @@ public class cSPADE<T extends Comparable<? super T>> {
             // <s1> <s1>;
             s1 = oneSequences.get(i);
             cand = candidateGenerator.temporalJoin(s1, s1);
-            candidateEqC = new EquivalenceClass<>(cand);
-            if (keepSeq(candidateEqC)){
-                this.root.getMembers().get(i).addMember(candidateEqC);
+            if (manageNewSequence(cand, this.root.getMembers().get(i))){
                 this.twoSequences.add(cand);
-                this.resultDataset.add(cand);
+                if (cMaxGap){
+                    Item<T> prefix = cand.getFirstItem();
+                    twoSeqsIndexedByPrefix.putIfAbsent(prefix, new ArrayList<>());
+                    twoSeqsIndexedByPrefix.get(prefix).add(new EquivalenceClass<>(cand));
+                }
             }
 
             for (int j = i+1; j < oneSequences.size(); j++){
@@ -115,7 +117,7 @@ public class cSPADE<T extends Comparable<? super T>> {
                 for (int k=0; k < candidates.length; k++){
                     cand = candidates[k];
                     EquivalenceClass<T> parent = this.root.getMembers().get(indices[k]);
-                    if (manageNewSequence(cand, parent, parent)){
+                    if (manageNewSequence(cand, parent)){
                         this.twoSequences.add(cand);
                         if (cMaxGap){
                             Item<T> prefix = cand.getFirstItem();
@@ -152,19 +154,27 @@ public class cSPADE<T extends Comparable<? super T>> {
         }
     }
 
+    public void setMinSup(Double minSup) {
+        this.minSup = minSup;
+    }
+
     private boolean manageNewSequence(Sequence<T> sequence, EquivalenceClass<T> eqc1, EquivalenceClass<T> eqc2){
         EquivalenceClass<T> newEqC = new EquivalenceClass<>(sequence);
 
         Double sup = this.measure.computePotentialValue(newEqC);
-
+        sequence.setSupport(sup);
         boolean keep = sup >= this.getMinSup();
-
+//        System.out.println(sequence + " keep");
         if (keep){
             sequence.setSupport(sup);
             ((sequence.getPrefix().equals(eqc1.sequence)) ? eqc1 : eqc2).add(newEqC);
             resultDataset.add(sequence);
         }
         return keep;
+    }
+
+    private boolean manageNewSequence(Sequence<T> sequence, EquivalenceClass<T> eqc){
+        return this.manageNewSequence(sequence, eqc, eqc);
     }
 
     public void enumerateSeq(EquivalenceClass<T> equivalenceClass, boolean remove){
@@ -204,8 +214,6 @@ public class cSPADE<T extends Comparable<? super T>> {
         }
     }
 
-//    public ArrayList<EquivalenceClass<T>>
-
     public void enumerateSeq(EquivalenceClass<T> equivalenceClass){
         this.enumerateSeq(equivalenceClass, false);
     }
@@ -232,5 +240,17 @@ public class cSPADE<T extends Comparable<? super T>> {
 
     public List<Sequence<T>> getOneSequences() {
         return oneSequences;
+    }
+
+    public void setEntryDataset(Dataset<Sequence<T>> entryDataset) {
+        this.entryDataset = entryDataset;
+    }
+
+    public void setMeasure(IMeasure<Double> measure) {
+        this.measure = measure;
+    }
+
+    public Dataset<Sequence<T>> getEntryDataset() {
+        return entryDataset;
     }
 }
