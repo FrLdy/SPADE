@@ -1,9 +1,18 @@
 package main.algorithm.spade;
 
 import main.algorithm.spade.deserializer.SequenceSPMFDeserializer;
+import main.algorithm.spade.deserializer.SequencesWeirauchDeserializer;
+import main.algorithm.spade.measure.Frequency;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.Dataset;
+import main.pattern.Item;
+import main.pattern.Itemset;
 import org.junit.jupiter.api.Test;
+import org.unix4j.Unix4j;
+import org.unix4j.line.Line;
+
+import java.io.File;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -80,5 +89,45 @@ class cSPADETest {
                 fail("Error " + cand+ " not in res");
             }
         }
+    }
+
+    @Test
+    void testWeirauch(){
+        cSPADE.setEntryDataset((Dataset<Sequence<String>>) new SequencesWeirauchDeserializer(
+                "data/pTH0914_HK.raw")
+                .deserialize()
+        );
+        int entrySize = cSPADE.getEntryDataset().size();
+        cSPADE.setMeasure(new Frequency(entrySize));
+        System.out.println(cSPADE.getEntryDataset().size());
+        System.out.println(cSPADE.getEntryDataset().get(0));
+        System.out.println(cSPADE.getEntryDataset().get(cSPADE.getEntryDataset().size()-1));
+        this.cSPADE.setMinSup(0.4);
+        this.cSPADE.setcMaxGap(true);
+        this.cSPADE.setMaxgap(1);
+        cSPADE.run();
+        File file = new File("data/pTH0914_HK.fil");
+        for (Sequence<String> sequence : cSPADE.getResultDataset()){
+            List<Line> lines = Unix4j.grep(this.seqstr(sequence), file).toLineList();
+            int nb = lines.size();
+            System.out.println(this.seqstr(sequence));
+            System.out.println(nb);
+//            if (sequence.getSupport() != nb/entrySize){
+//                fail(sequence.toString()+ " " + sequence.getSupport() + " " + nb/entrySize);
+//            }
+        }
+    }
+
+    String seqstr(Sequence<String> seq){
+        StringBuilder res = new StringBuilder();
+        for (Itemset<String> items : seq){
+            for (Item<String> item : items){
+                res.append(item.toString());
+                if (items.size() > 1){
+                    res.append('-');
+                }
+            }
+        }
+        return res.toString();
     }
 }
