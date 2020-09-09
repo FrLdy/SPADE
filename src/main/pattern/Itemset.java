@@ -48,7 +48,7 @@ public class Itemset<T extends Comparable<? super T>> extends ArrayList<Item<T>>
      */
     public Itemset<T> cloneItemset() {
         Itemset<T> itemset = new Itemset<>();
-        for (Item item : this){
+        for (Item<T> item : this){
             itemset.add(item.cloneItem());
         }
         return itemset;
