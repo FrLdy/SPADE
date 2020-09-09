@@ -204,5 +204,7 @@ public class Sequence<T extends Comparable<? super T>> extends ArrayList<Itemset
         return true;
     }
 
-
+    public Item<T> getFirstItem() {
+        return this.get(0).get(0);
+    }
 }
