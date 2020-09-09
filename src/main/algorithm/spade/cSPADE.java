@@ -13,18 +13,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class cSPADE<T extends Comparable<? super T>> {
+    boolean cMinGap, cMaxGap;
+    int mingap, maxgap;
     private Double minSup;
     private Dataset<Sequence<T>> entryDataset;
     private Dataset<Sequence<T>> resultDataset;
     private EquivalenceClass<T> root = new EquivalenceClass<>();
     private IMeasure<Double> measure;
-    private CandidateGenerator<T> candidateGenerator = new CandidateGenerator<>();
+    private CandidateGenerator<T> candidateGenerator;
     private List<Sequence<T>> oneSequences = new ArrayList<>();
     private List<Sequence<T>> twoSequences = new ArrayList<>();
-    private HashMap<Item<T>, EquivalenceClass<T>> twoSeqsIndexedBysuffix = new HashMap<>();
+    private HashMap<Item<T>, ArrayList<EquivalenceClass<T>>> twoSeqsIndexedByPrefix = new HashMap<>();
     private boolean dfs;
-    boolean cMinGap, cMaxGap;
-    int mingap, maxgap;
 
     public cSPADE(Double minSup, Dataset<Sequence<T>> entryDataset, Dataset<Sequence<T>> resultDataset, boolean dfs,
                   Integer mingap, Integer maxgap) {
@@ -37,13 +37,32 @@ public class cSPADE<T extends Comparable<? super T>> {
         this.maxgap = maxgap;
         this.cMinGap = mingap > -1;
         this.cMaxGap = maxgap > -1;
+        this.candidateGenerator = new CandidateGenerator<>(cMinGap, cMaxGap, mingap, maxgap);
     }
 
     public cSPADE(Double minSup, Dataset<Sequence<T>> entryDataset, boolean dfs) {
         this(minSup, entryDataset, new Dataset<>(), dfs, -1, -1);
     }
 
+    public void setcMinGap(boolean cMinGap) {
+        this.cMinGap = cMinGap;
+        this.candidateGenerator.setcMinGap(cMinGap);
+    }
 
+    public void setcMaxGap(boolean cMaxGap) {
+        this.cMaxGap = cMaxGap;
+        this.candidateGenerator.setcMaxGap(cMaxGap);
+    }
+
+    public void setMingap(int mingap) {
+        this.mingap = mingap;
+        this.candidateGenerator.setMingap(mingap);
+    }
+
+    public void setMaxgap(int maxgap) {
+        this.maxgap = maxgap;
+        this.candidateGenerator.setMaxgap(maxgap);
+    }
 
     void computeOneSequences(){
         HashMap<Item<T>, Sequence<T>> res = new HashMap<>();
@@ -84,6 +103,7 @@ public class cSPADE<T extends Comparable<? super T>> {
                 this.twoSequences.add(cand);
                 this.resultDataset.add(cand);
             }
+
             for (int j = i+1; j < oneSequences.size(); j++){
                 s2 = oneSequences.get(j);
                 Sequence[] candidates = new Sequence[]{
@@ -97,6 +117,11 @@ public class cSPADE<T extends Comparable<? super T>> {
                     EquivalenceClass<T> parent = this.root.getMembers().get(indices[k]);
                     if (manageNewSequence(cand, parent, parent)){
                         this.twoSequences.add(cand);
+                        if (cMaxGap){
+                            Item<T> prefix = cand.getFirstItem();
+                            twoSeqsIndexedByPrefix.putIfAbsent(prefix, new ArrayList<>());
+                            twoSeqsIndexedByPrefix.get(prefix).add(new EquivalenceClass<>(cand));
+                        }
                     }
                 }
             }
@@ -120,7 +145,6 @@ public class cSPADE<T extends Comparable<? super T>> {
     }
 
     private void printEqCl(EquivalenceClass<T> equivalenceClass){
-        System.out.println(equivalenceClass);
         if (!equivalenceClass.getMembers().isEmpty()){
             for (EquivalenceClass<T> e : equivalenceClass.getMembers()){
                 printEqCl(e);
@@ -132,7 +156,9 @@ public class cSPADE<T extends Comparable<? super T>> {
         EquivalenceClass<T> newEqC = new EquivalenceClass<>(sequence);
 
         Double sup = this.measure.computePotentialValue(newEqC);
+
         boolean keep = sup >= this.getMinSup();
+
         if (keep){
             sequence.setSupport(sup);
             ((sequence.getPrefix().equals(eqc1.sequence)) ? eqc1 : eqc2).add(newEqC);
@@ -150,8 +176,8 @@ public class cSPADE<T extends Comparable<? super T>> {
             EquivalenceClass<T> eqC1 = equivalenceClass.get(i);
             List<EquivalenceClass<T>> eqC2s;
             if (cMaxGap){
-                Item<T> sufixItem = eqC1.sequence.getLastItem();
-                eqC2s = new ArrayList<>();
+                Item<T> suffix = eqC1.sequence.getLastItem();
+                eqC2s = twoSeqsIndexedByPrefix.get(suffix);
             } else {
                 eqC2s = equivalenceClass.subList(i, equivalenceClass.size());
             }
@@ -194,5 +220,17 @@ public class cSPADE<T extends Comparable<? super T>> {
 
     public Dataset<Sequence<T>> getResultDataset() {
         return this.resultDataset;
+    }
+
+    public HashMap<Item<T>, ArrayList<EquivalenceClass<T>>> getTwoSeqsIndexedByPrefix() {
+        return twoSeqsIndexedByPrefix;
+    }
+
+    public CandidateGenerator<T> getCandidateGenerator() {
+        return candidateGenerator;
+    }
+
+    public List<Sequence<T>> getOneSequences() {
+        return oneSequences;
     }
 }
