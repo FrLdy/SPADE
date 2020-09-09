@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class cSPADE<T extends Comparable<? super T>> {
-    boolean cMinGap, cMaxGap;
-    int mingap, maxgap;
+    private boolean cMinGap, cMaxGap;
+    private int mingap, maxgap;
     private Double minSup;
     private Dataset<Sequence<T>> entryDataset;
     private Dataset<Sequence<T>> resultDataset;
