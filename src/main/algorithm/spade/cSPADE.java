@@ -1,7 +1,7 @@
 package main.algorithm.spade;
 
 import main.algorithm.spade.measure.Frequency;
-import main.algorithm.spade.measure.IMeasure;
+import main.algorithm.spade.measure.Measure;
 import main.algorithm.spade.structure.EquivalenceClass;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.Dataset;
@@ -19,7 +19,7 @@ public class cSPADE<T extends Comparable<? super T>> {
     private Dataset<Sequence<T>> entryDataset;
     private Dataset<Sequence<T>> resultDataset;
     private EquivalenceClass<T> root = new EquivalenceClass<>();
-    private IMeasure<Double> measure;
+    private Measure<Double> measure;
     private CandidateGenerator<T> candidateGenerator;
     private List<Sequence<T>> oneSequences = new ArrayList<>();
     private List<Sequence<T>> twoSequences = new ArrayList<>();
@@ -246,7 +246,7 @@ public class cSPADE<T extends Comparable<? super T>> {
         this.entryDataset = entryDataset;
     }
 
-    public void setMeasure(IMeasure<Double> measure) {
+    public void setMeasure(Measure<Double> measure) {
         this.measure = measure;
     }
 

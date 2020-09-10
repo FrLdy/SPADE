@@ -5,6 +5,7 @@ import main.algorithm.spade.deserializer.SequencesWeirauchDeserializer;
 import main.algorithm.spade.measure.Frequency;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.Dataset;
+import main.dataset.serializer.SequenceSerializer;
 import main.pattern.Item;
 import main.pattern.Itemset;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.unix4j.Unix4j;
 import org.unix4j.line.Line;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class cSPADETest {
     private SequenceSPMFDeserializer<String> deserializer = new SequenceSPMFDeserializer<>();
     private cSPADE<String> cSPADE;
-
+    private SequenceSerializer<Sequence<String>, String> serializer;
     public cSPADETest() {
         Dataset<Sequence<String>> dataset = (Dataset<Sequence<String>>) new SequenceSPMFDeserializer<String>("data/spadeTest1.txt").deserialize();
         cSPADE = new cSPADE<>(0.5, dataset, false);
@@ -92,7 +94,7 @@ class cSPADETest {
     }
 
     @Test
-    void testWeirauch(){
+    void testWeirauch() throws IOException {
         cSPADE.setEntryDataset((Dataset<Sequence<String>>) new SequencesWeirauchDeserializer(
                 "data/pTH0914_HK.raw")
                 .deserialize()
@@ -103,6 +105,35 @@ class cSPADETest {
         this.cSPADE.setcMaxGap(true);
         this.cSPADE.setMaxgap(1);
         cSPADE.run();
+
+        serializer = new SequenceSerializer<Sequence<String>, String>("data/out/pTH0914_HK.freq."+cSPADE.getMinSup()+".res") {
+
+            @Override
+            public String itemsetToString(Itemset<String> itemset) {
+                StringBuilder sb = new StringBuilder();
+                for (Item<String> item: itemset){
+                    sb.append(item);
+                }
+                return sb.toString();
+            }
+
+            @Override
+            public java.lang.String PatternToString(Sequence<java.lang.String> sequence) {
+                StringBuilder sb = new StringBuilder();
+                for (Itemset<String> items: sequence){
+                    sb.append(itemsetToString(items));
+                }
+                sb.append(";").append(sequence.getSupport().toString());
+                return sb.toString();
+            }
+
+            @Override
+            public void serialize(Dataset<Sequence<String>> dataset) throws IOException {
+                fileWriter.write("frequent sequence;support(%)\n");
+                super.serialize(dataset);
+            }
+        };
+
         File file = new File("data/pTH0914_HK.fil");
         for (Sequence<String> sequence : cSPADE.getResultDataset()){
             List<Line> lines = Unix4j.grep(this.seqstr(sequence), file).toLineList();
@@ -112,6 +143,8 @@ class cSPADETest {
                 fail(sequence.toString()+ " " + sequence.getSupport() + " " + prop);
             }
         }
+
+        serializer.serialize(cSPADE.getResultDataset());
     }
 
     String seqstr(Sequence<String> seq){

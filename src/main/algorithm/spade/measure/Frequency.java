@@ -2,9 +2,13 @@ package main.algorithm.spade.measure;
 
 import main.algorithm.spade.structure.EquivalenceClass;
 
-public class Frequency implements IMeasure<Double> {
+import javax.naming.Name;
 
+public class Frequency extends Measure<Double> {
+
+    private String name = "frequency";
     private final int datasetSize;
+
     public Frequency(int size) {
         this.datasetSize = size;
     }
@@ -17,5 +21,10 @@ public class Frequency implements IMeasure<Double> {
     @Override
     public Double computePotentialValue(EquivalenceClass equivalenceClass) {
         return computeConcreteValue(equivalenceClass);
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 }
