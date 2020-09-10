@@ -94,7 +94,7 @@ class cSPADETest {
     }
 
     @Test
-    void testWeirauch() throws IOException {
+    void testWeihrauch() throws IOException {
         cSPADE.setEntryDataset((Dataset<Sequence<String>>) new SequencesWeirauchDeserializer(
                 "data/pTH0914_HK.raw")
                 .deserialize()
