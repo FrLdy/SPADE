@@ -8,13 +8,16 @@ import main.dataset.Dataset;
 import main.dataset.serializer.SequenceSerializer;
 import main.pattern.Item;
 import main.pattern.Itemset;
+import org.apache.commons.collections4.iterators.PermutationIterator;
+import org.apache.commons.math3.util.Combinations;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.junit.jupiter.api.Test;
 import org.unix4j.Unix4j;
 import org.unix4j.line.Line;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,19 +97,49 @@ class cSPADETest {
     }
 
     @Test
-    void testWeihrauch() throws IOException {
+    void testWeihrauchGap1() throws IOException {
         cSPADE.setEntryDataset((Dataset<Sequence<String>>) new SequencesWeirauchDeserializer(
                 "data/pTH0914_HK.raw")
                 .deserialize()
         );
         double entrySize = cSPADE.getEntryDataset().size();
         cSPADE.setMeasure(new Frequency((int) entrySize));
-        this.cSPADE.setMinSup(0.4);
+        this.cSPADE.setMinSup(0.7);
         this.cSPADE.setcMaxGap(true);
-        this.cSPADE.setMaxgap(1);
+        this.cSPADE.setMaxgap(2);
         cSPADE.run();
 
-        serializer = new SequenceSerializer<Sequence<String>, String>("data/out/pTH0914_HK.freq."+cSPADE.getMinSup()+".res") {
+        serializer = getSerializer("data/out/pTH0914_HK.freq."+cSPADE.getMinSup()+".gap."+cSPADE.getMaxgap()+"res");
+
+        File file = new File("data/pTH0914_HK.fil");
+        for (Sequence<String> sequence : cSPADE.getResultDataset()){
+            List<Line> lines = Unix4j.grep(this.seqstr(sequence, cSPADE.getMaxgap()-1), file).toLineList();
+            double nb = lines.size();
+            double prop = nb/entrySize;
+            if (sequence.getSupport() != prop){
+                fail(sequence.toString()+ " " + sequence.getSupport() + " " + prop);
+            }
+        }
+
+        serializer.serialize(cSPADE.getResultDataset());
+    }
+
+    String seqstr(Sequence<String> seq, int gap){
+        StringBuilder res = new StringBuilder();
+        for (Itemset<String> items : seq){
+            for (Item<String> item : items){
+                res.append(item.toString())
+                        .append(".{0,"+gap+"}");
+                if (items.size() > 1){
+                    res.append('-');
+                }
+            }
+        }
+        return res.toString();
+    }
+
+    SequenceSerializer<Sequence<String>, String> getSerializer(String path){
+        return new SequenceSerializer<Sequence<String>, String>(path) {
 
             @Override
             public String itemsetToString(Itemset<String> itemset) {
@@ -133,30 +166,5 @@ class cSPADETest {
                 super.serialize(dataset);
             }
         };
-
-        File file = new File("data/pTH0914_HK.fil");
-        for (Sequence<String> sequence : cSPADE.getResultDataset()){
-            List<Line> lines = Unix4j.grep(this.seqstr(sequence), file).toLineList();
-            double nb = lines.size();
-            double prop = nb/entrySize;
-            if (sequence.getSupport() != prop){
-                fail(sequence.toString()+ " " + sequence.getSupport() + " " + prop);
-            }
-        }
-
-        serializer.serialize(cSPADE.getResultDataset());
-    }
-
-    String seqstr(Sequence<String> seq){
-        StringBuilder res = new StringBuilder();
-        for (Itemset<String> items : seq){
-            for (Item<String> item : items){
-                res.append(item.toString());
-                if (items.size() > 1){
-                    res.append('-');
-                }
-            }
-        }
-        return res.toString();
     }
 }

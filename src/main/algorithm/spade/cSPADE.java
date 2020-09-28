@@ -134,6 +134,10 @@ public class cSPADE<T extends Comparable<? super T>> {
         return minSup;
     }
 
+    public int getMaxgap() {
+        return maxgap;
+    }
+
     private boolean keepSeq(EquivalenceClass<T> equivalenceClass, boolean verbose){
         Double sup = this.measure.computePotentialValue(equivalenceClass);
         if (verbose){
