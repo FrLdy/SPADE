@@ -5,6 +5,7 @@ import main.algorithm.spade.deserializer.SequencesWeirauchDeserializer;
 import main.algorithm.spade.measure.Frequency;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.Dataset;
+import main.dataset.DatasetWithLabels;
 import main.dataset.serializer.SequenceSerializer;
 import main.pattern.Item;
 import main.pattern.Itemset;
@@ -25,9 +26,16 @@ class cSPADETest {
     private SequenceSPMFDeserializer<String> deserializer = new SequenceSPMFDeserializer<>();
     private cSPADE<String> cSPADE;
     private SequenceSerializer<Sequence<String>, String> serializer;
+    Dataset<Sequence<String>> dataset;
+
     public cSPADETest() {
-        Dataset<Sequence<String>> dataset = (Dataset<Sequence<String>>) new SequenceSPMFDeserializer<String>("data/spadeTest1.txt").deserialize();
+        dataset = (Dataset<Sequence<String>>) new SequenceSPMFDeserializer<String>("data/spadeTest1.txt").deserialize();
         cSPADE = new cSPADE<>(0.5, dataset, false);
+    }
+
+    @Test
+    void printDataset(){
+        System.out.println(dataset);
     }
 
     @Test
@@ -98,10 +106,9 @@ class cSPADETest {
 
     @Test
     void testWeihrauchGap1() throws IOException {
-        cSPADE.setEntryDataset((Dataset<Sequence<String>>) new SequencesWeirauchDeserializer(
-                "data/pTH0914_HK.raw")
-                .deserialize()
-        );
+        DatasetWithLabels<Sequence<String>, Double> sequences = (DatasetWithLabels<Sequence<String>, Double>) new SequencesWeirauchDeserializer(
+                "data/pTH0914_HK.raw").deserialize();
+        cSPADE.setEntryDataset(sequences);
         double entrySize = cSPADE.getEntryDataset().size();
         cSPADE.setMeasure(new Frequency((int) entrySize));
         this.cSPADE.setMinSup(0.7);
