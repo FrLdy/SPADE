@@ -23,7 +23,7 @@ public class Sequence<T extends Comparable<? super T>> extends ArrayList<Itemset
      * General constructor for a sequence.
      * @param id The sequence identifier.
      */
-    private Sequence(int id) {
+    private Sequence(Integer id) {
         this.id = id;
     }
 
@@ -35,6 +35,9 @@ public class Sequence<T extends Comparable<? super T>> extends ArrayList<Itemset
     public Sequence(List<Itemset<T>> itemsets){
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     /**
      * Get the sequence id.
@@ -121,6 +124,8 @@ public class Sequence<T extends Comparable<? super T>> extends ArrayList<Itemset
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(id);
+        stringBuilder.append(": ");
         for (int i = 0; i < this.size(); i++) {
             stringBuilder.append(this.get(i).toString());
             stringBuilder.append((i != this.size()-1) ? " " : "");

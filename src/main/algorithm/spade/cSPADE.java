@@ -76,7 +76,7 @@ public class cSPADE<T extends Comparable<? super T>> {
                 Itemset<T> itemset = sequence.get(eid);
                 for (Item<T> item : itemset){
                     res.putIfAbsent(item, new Sequence<>(item));
-                    res.get(item).getIdList().add(sid, eid);
+                    res.get(item).getIdList().add(sequence.getId(), eid);
                 }
             }
         }

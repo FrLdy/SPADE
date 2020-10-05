@@ -60,7 +60,11 @@ public abstract class Deserializer<P extends IPattern> {
      * @param sequenceString the string representation of the pattern.
      * @return the conversion of the pattern string representation to Pattern instance.
      */
+    public abstract P stringToPattern(String sequenceString, Integer id);
+
     public abstract P stringToPattern(String sequenceString);
+
+
 
     /**
      * Method which traverses the data file to store all pattern in the database.

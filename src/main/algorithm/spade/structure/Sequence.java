@@ -11,8 +11,9 @@ public class Sequence<T extends Comparable<? super T>> extends main.pattern.Sequ
         this.setIdList(new IdList());
     }
 
-    public Sequence(String seq){
-
+    public Sequence(Integer id){
+        this();
+        this.setId(id);
     }
 
     public Sequence(Item<T> item){

@@ -26,15 +26,20 @@ public class SequenceSPMFDeserializer<T extends Comparable<? super T>> extends S
         this("");
     }
 
-
+    @Override
+    public Sequence<T> stringToPattern(String sequenceString) {
+        return stringToPattern(sequenceString, null);
+    }
 
     @Override
     public IDataset<Sequence<T>> deserialize() {
         IDataset<Sequence<T>> sequenceDatabase = new Dataset<>();
         try {
             String currentLine;
+            int cptid = 0;
             while ((currentLine = bufferedReader.readLine()) != null) {
-                sequenceDatabase.add(stringToPattern(currentLine));
+                cptid ++;
+                sequenceDatabase.add(stringToPattern(currentLine, cptid));
             }
         } catch (IOException e){
             e.printStackTrace();
@@ -45,8 +50,8 @@ public class SequenceSPMFDeserializer<T extends Comparable<? super T>> extends S
     }
 
     @Override
-    public Sequence<T> stringToPattern(String sequenceString){
-        Sequence<T> sequence = new Sequence<>();
+    public Sequence<T> stringToPattern(String sequenceString, Integer id){
+        Sequence<T> sequence = new Sequence<>(id);
         for (String stringItemset : sequenceString.split(itemsetsSeparator)){
             stringItemset = stringItemset.trim();
             if (stringItemset.equals(this.sequencesSeparator)){

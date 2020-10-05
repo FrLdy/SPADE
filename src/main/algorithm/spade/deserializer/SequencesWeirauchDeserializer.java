@@ -18,12 +18,17 @@ public class SequencesWeirauchDeserializer extends SequenceDeserializer<Sequence
     }
 
     @Override
-    public Sequence<String> stringToPattern(String sequenceString) {
-        Sequence<String> sequence = new Sequence<>();
+    public Sequence<String> stringToPattern(String sequenceString, Integer id) {
+        Sequence<String> sequence = new Sequence<>(id);
         for (String item : sequenceString.split("")) {
             sequence.add(this.stringToItemset(item));
         }
         return sequence;
+    }
+
+    @Override
+    public Sequence<String> stringToPattern(String sequenceString) {
+        return stringToPattern(sequenceString, null);
     }
 
     public Itemset<String> stringToItemset(String itemsetString) {
@@ -43,15 +48,17 @@ public class SequencesWeirauchDeserializer extends SequenceDeserializer<Sequence
         try {
             String currentLine;
             LineNumberReader lineNumberReader = new LineNumberReader(bufferedReader);
+            int cptid = 0;
             while ((currentLine = lineNumberReader.readLine()) != null) {
                 if (lineNumberReader.getLineNumber() != 1) {
+                    cptid ++;
                     String[] line = currentLine.split("\\s+");
                     if (line.length == 10) {
                         int sequencePosition = 5;
-                        Sequence<String> sequence = this.stringToPattern(line[sequencePosition]);
+                        Sequence<String> sequence = this.stringToPattern(line[sequencePosition], cptid);
                         int labelPosition = 7;
                         Double label = this.stringToLabel(line[labelPosition]);
-                        sequenceDatabase.add(sequence, label);
+                        sequenceDatabase.add(sequence, sequence.getId(), label);
                     }
                 }
             }
