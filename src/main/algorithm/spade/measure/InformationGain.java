@@ -1,10 +1,8 @@
 package main.algorithm.spade.measure;
 
 import main.algorithm.spade.structure.EquivalenceClass;
-import main.algorithm.spade.structure.IdList;
 import main.algorithm.spade.structure.Sequence;
 import main.dataset.DatasetWithLabels;
-import main.pattern.IPattern;
 
 import java.util.*;
 
@@ -36,7 +34,7 @@ public class InformationGain<L> extends Measure<Double> {
         return -p*Math.log(p) - (1 - p)*Math.log(1 - p);
     }
 
-    Double computeEntropy(int x, int y, Sequence sequence){
+    Double computeInformationGain(int x, int y, Sequence sequence){
         int n = this.datasetSize;
         int oi_ = n - x;
         int oc = Collections.frequency(this.labels.values(), getSequenceClass(sequence));
@@ -45,18 +43,18 @@ public class InformationGain<L> extends Measure<Double> {
                 - x/n * computeEntropy(y/x)
                 - oi_/n*computeEntropy(oi_c/oi_);
     }
-    Double computeEntropy(Sequence sequence){
+    Double computeInformationGain(Sequence sequence){
         int n = this.datasetSize;
         int x = sequence.getIdList().size();
         int y = Collections.frequency(sequence.getIdList().keySet(), getSequenceClass(sequence));
-        return computeEntropy(x, y, sequence);
+        return computeInformationGain(x, y, sequence);
     }
 
     Double computeUpperBound(Sequence sequence){
         int n = this.datasetSize;
         int x = sequence.getIdList().size();
         int y = Collections.frequency(sequence.getIdList().keySet(), getSequenceClass(sequence));
-        return Math.max(computeEntropy(y, y, sequence), computeEntropy(x-y, 0, sequence));
+        return Math.max(computeInformationGain(y, y, sequence), computeInformationGain(x-y, 0, sequence));
     }
 
     private L getSequenceClass(Sequence sequence){
