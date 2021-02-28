@@ -9,9 +9,6 @@ import main.dataset.DatasetWithLabels;
 import main.dataset.serializer.SequenceSerializer;
 import main.pattern.Item;
 import main.pattern.Itemset;
-import org.apache.commons.collections4.iterators.PermutationIterator;
-import org.apache.commons.math3.util.Combinations;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.junit.jupiter.api.Test;
 import org.unix4j.Unix4j;
 import org.unix4j.line.Line;
@@ -107,7 +104,7 @@ class cSPADETest {
     @Test
     void testWeihrauchGap1() throws IOException {
         DatasetWithLabels<Sequence<String>, Double> sequences = (DatasetWithLabels<Sequence<String>, Double>) new SequencesWeirauchDeserializer(
-                "data/pTH0914_HK.raw").deserialize();
+                "data/pTH0914_HK.fil").deserialize();
         cSPADE.setEntryDataset(sequences);
         double entrySize = cSPADE.getEntryDataset().size();
         cSPADE.setMeasure(new Frequency((int) entrySize));
